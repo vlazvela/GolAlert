@@ -1,3 +1,10 @@
-from datetime import datetime
+from flask import Flask
 
-print("Script ejecutado a las:", datetime.now())
+app = Flask(__name__)
+
+@app.route('/run')
+def ejecutar():
+    return "✅ Script ejecutado correctamente desde Flask"
+
+if __name__ == '__main__':
+    app.run()
