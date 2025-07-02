@@ -50,7 +50,7 @@ def listar_ligas():
                 "temporada": liga["seasons"][-1]["year"]  # Última temporada disponible
             })
 
-        return {"ligas": resumen[:50]}  # Muestra solo las 50 primeras para empezar
+        return {"ligas": resumen[:150]}  # Muestra solo las 50 primeras para empezar
     else:
         return f"❌ Error al obtener ligas: {response.status_code}"
 
