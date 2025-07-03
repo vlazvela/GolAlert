@@ -2,7 +2,8 @@ import os
 import requests
 import json
 from flask import Flask, jsonify
-from datetime import datetime
+#from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # Cargar variables del archivo .env
@@ -23,7 +24,9 @@ def index():
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
-        hoy = datetime.utcnow().strftime('%Y-%m-%d')
+        #hoy = datetime.utcnow().strftime('%Y-%m-%d')
+        hoy = (datetime.utcnow() - timedelta(hours=5)).strftime('%Y-%m-%d')
+
         url = f"https://v3.football.api-sports.io/fixtures?date={hoy}"
 
         response = requests.get(url, headers=HEADERS)
