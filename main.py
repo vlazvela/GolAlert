@@ -2,25 +2,25 @@ import os
 import requests
 import json
 from flask import Flask, jsonify
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil import parser
 
 # Inicializar Flask
 app = Flask(__name__)
 
-# Variables globales
+# API Key desde variables de entorno
 API_KEY = os.getenv("API_KEY")
 HEADERS = {
     "x-rapidapi-host": "v3.football.api-sports.io",
     "x-rapidapi-key": API_KEY
 }
 
-# Ruta de prueba
+# Endpoint para verificar conexión
 @app.route('/run')
 def index():
     return "✅ Conectado a API-Football: Vlaz"
 
-# Ruta principal para filtrar partidos de hoy
+# Endpoint para listar partidos de hoy en ligas permitidas
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
@@ -32,18 +32,15 @@ def filtrar_partidos_hoy():
         partidos_filtrados = []
 
         for liga in ligas_permitidas:
-            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&date={hoy}"
+            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&season=2025&date={hoy}"
             response = requests.get(url, headers=HEADERS)
             data = response.json()
 
             for partido in data.get("response", []):
-                fecha_utc = parser.isoparse(partido["fixture"]["date"])
-                hora_local = (fecha_utc - timedelta(hours=5)).strftime("%H:%M")
-
                 partidos_filtrados.append({
                     "liga": partido["league"]["name"],
                     "partido": f'{partido["teams"]["home"]["name"]} vs {partido["teams"]["away"]["name"]}',
-                    "hora": hora_local,
+                    "hora": parser.isoparse(partido["fixture"]["date"]).strftime("%H:%M"),
                     "pais": partido["league"]["country"]
                 })
 
