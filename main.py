@@ -21,12 +21,17 @@ HEADERS = {
 
 print("API_KEY cargada:", bool(API_KEY))
 
-# Endpoint para verificar conexión
+# Endpoint raíz
+@app.route('/')
+def home():
+    return "✅ GolAlert API en línea"
+
+# Verificar conexión
 @app.route('/run')
 def index():
     return "✅ Conectado a API-Football: Vlaz"
 
-# Endpoint para listar partidos de hoy en ligas permitidas
+# Partidos de hoy (ajustado a hora Perú)
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
@@ -62,7 +67,7 @@ def filtrar_partidos_hoy():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Endpoint para obtener estadísticas de partidos ya jugados (temporal)
+# Estadísticas de partidos jugados ayer
 @app.route('/estadisticas', methods=['GET'])
 def obtener_estadisticas_partidos_finalizados():
     try:
