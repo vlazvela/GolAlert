@@ -4,18 +4,10 @@ import json
 from flask import Flask, jsonify
 from datetime import datetime, timedelta
 from dateutil import parser
-'''
-import firebase_admin
-from firebase_admin import credentials, firestore
-'''
+
 # Inicializar Flask
 app = Flask(__name__)
-'''
-# Inicializar Firebase
-cred = credentials.Certificate("clave-firebase.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-'''
+
 # Variables globales
 API_KEY = os.getenv("API_KEY")
 HEADERS = {
@@ -66,13 +58,3 @@ def index():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
-
-'''
-        # Guardar en Firebase
-        doc_ref = db.collection("partidos").document("hoy")
-        doc_ref.set({
-            "fecha": hoy,
-            "partidos": partidos_filtrados
-        })
-'''
