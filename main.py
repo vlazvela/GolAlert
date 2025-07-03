@@ -27,7 +27,8 @@ def filtrar_partidos_hoy():
     try:
         #hoy = datetime.utcnow().strftime('%Y-%m-%d')
         #hoy = (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d')
-        hoy = (datetime.utcnow() - timedelta(hours=5)).strftime('%Y-%m-%d')
+        #hoy = (datetime.utcnow() - timedelta(hours=5)).strftime('%Y-%m-%d')
+        hoy = "2025-07-02"
 
 
         with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
