@@ -28,13 +28,15 @@ def filtrar_partidos_hoy():
         #hoy = datetime.utcnow().strftime('%Y-%m-%d')
         hoy = (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d')
 
+
         with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
             ligas_permitidas = json.load(f)
 
         partidos_filtrados = []
 
         for liga in ligas_permitidas:
-            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&season=2025&date={hoy}"
+            #url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&season=2025&date={hoy}"
+            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&date={hoy}"
             response = requests.get(url, headers=HEADERS)
             data = response.json()
 
