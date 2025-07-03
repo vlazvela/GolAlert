@@ -3,18 +3,21 @@ import requests
 import json
 from flask import Flask, jsonify
 #from datetime import datetime
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil import parser
 
 # Inicializar Flask
 app = Flask(__name__)
 
 # API Key desde variables de entorno
-API_KEY = os.getenv("API_KEY")
+API_KEY = os.getenv("API_FOOTBALL_KEY")
 HEADERS = {
     "x-rapidapi-host": "v3.football.api-sports.io",
     "x-rapidapi-key": API_KEY
 }
+
+print("API_KEY cargada:", bool(API_KEY))
+
 
 # Endpoint para verificar conexión
 @app.route('/run')
@@ -25,11 +28,7 @@ def index():
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
-        #hoy = datetime.utcnow().strftime('%Y-%m-%d')
-        #hoy = (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d')
-        #hoy = (datetime.utcnow() - timedelta(hours=5)).strftime('%Y-%m-%d')
-        hoy = "2025-07-02"
-
+        hoy = datetime.utcnow().strftime('%Y-%m-%d')
 
         with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
             ligas_permitidas = json.load(f)
