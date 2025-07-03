@@ -59,7 +59,6 @@ def partidos_en_vivo():
             partidos.append({
                 "liga": liga,
                 "pais": pais,
-                "fixture_id": partido["fixture"]["id"],
                 "partido": f"{local} vs {visitante}",
                 "minuto": minuto,
                 "marcador": f"{goles_local} - {goles_visitante}",
