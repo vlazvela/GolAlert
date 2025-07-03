@@ -10,6 +10,7 @@
   {"id": 143, "nombre": "Copa del Rey", "pais": "Spain"},
   {"id": 253, "nombre": "Major League Soccer", "pais": "USA"},
   {"id": 255, "nombre": "USL Championship", "pais": "USA"},
+  {"id": 256, "nombre": "USL League Two", "pais": "USA"},
   {"id": 2, "nombre": "UEFA Champions League", "pais": "World"},
   {"id": 3, "nombre": "UEFA Europa League", "pais": "World"},
   {"id": 61, "nombre": "Ligue 1", "pais": "France"},
