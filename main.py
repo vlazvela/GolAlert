@@ -63,6 +63,69 @@ def partidos_en_vivo():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+#from datetime import timedelta
+
+@app.route('/estadisticas', methods=['GET'])
+def estadisticas_partidos():
+    try:
+        ayer = (datetime.utcnow() - timedelta(days=1)).strftime('%Y-%m-%d')
+
+        with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
+            ligas_permitidas = json.load(f)
+
+        ids_ligas = {liga["id"] for liga in ligas_permitidas}
+        partidos_con_estadisticas = []
+
+        for liga_id in ids_ligas:
+            url = f"https://v3.football.api-sports.io/fixtures?league={liga_id}&date={ayer}"
+            res = requests.get(url, headers=HEADERS)
+            fixtures = res.json().get("response", [])
+
+            for fixture in fixtures:
+                match_id = fixture["fixture"]["id"]
+                liga_nombre = fixture["league"]["name"]
+                nombre_partido = f'{fixture["teams"]["home"]["name"]} vs {fixture["teams"]["away"]["name"]}'
+
+                stats_url = f"https://v3.football.api-sports.io/fixtures/statistics?fixture={match_id}"
+                stats_res = requests.get(stats_url, headers=HEADERS)
+                stats_data = stats_res.json().get("response", [])
+
+                if len(stats_data) < 2:
+                    continue
+
+                local_stats = {item["type"]: item["value"] for item in stats_data[0]["statistics"]}
+                visitante_stats = {item["type"]: item["value"] for item in stats_data[1]["statistics"]}
+
+                tipos_deseados = [
+                    "Goals", "Total Shots", "Shots on Goal", "Shots off Goal",
+                    "Blocked Shots", "Corner Kicks", "Red Cards", "Saves",
+                    "Big Chances", "Big Chances Missed"
+                ]
+
+                resumen = {}
+                for tipo in tipos_deseados:
+                    resumen[tipo] = {
+                        "local": local_stats.get(tipo),
+                        "visitante": visitante_stats.get(tipo)
+                    }
+
+                partidos_con_estadisticas.append({
+                    "liga": liga_nombre,
+                    "partido": nombre_partido,
+                    "estadisticas": resumen
+                })
+
+        return jsonify({
+            "fecha": ayer,
+            "total_partidos": len(partidos_con_estadisticas),
+            "partidos": partidos_con_estadisticas
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # Ejecutar app
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
