@@ -2,7 +2,8 @@ import os
 import requests
 import json
 from flask import Flask, jsonify
-from datetime import datetime
+#from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 
 # Inicializar Flask
