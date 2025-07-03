@@ -2,9 +2,12 @@ import os
 import requests
 import json
 from flask import Flask, jsonify
-#from datetime import datetime
 from datetime import datetime
 from dateutil import parser
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde .env
+load_dotenv()
 
 # Inicializar Flask
 app = Flask(__name__)
@@ -17,7 +20,6 @@ HEADERS = {
 }
 
 print("API_KEY cargada:", bool(API_KEY))
-
 
 # Endpoint para verificar conexión
 @app.route('/run')
@@ -36,7 +38,6 @@ def filtrar_partidos_hoy():
         partidos_filtrados = []
 
         for liga in ligas_permitidas:
-            #url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&season=2025&date={hoy}"
             url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&date={hoy}"
             response = requests.get(url, headers=HEADERS)
             data = response.json()
