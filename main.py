@@ -5,14 +5,22 @@ from flask import Flask, jsonify
 from datetime import datetime, timedelta
 from dateutil import parser
 
+# Inicializar Flask
 app = Flask(__name__)
 
+# Variables globales
 API_KEY = os.getenv("API_KEY")
 HEADERS = {
     "x-rapidapi-host": "v3.football.api-sports.io",
     "x-rapidapi-key": API_KEY
 }
 
+# Ruta de prueba
+@app.route('/run')
+def index():
+    return "✅ Conectado a API-Football: Vlaz"
+
+# Ruta principal para filtrar partidos de hoy
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
@@ -24,7 +32,7 @@ def filtrar_partidos_hoy():
         partidos_filtrados = []
 
         for liga in ligas_permitidas:
-            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&season={liga['temporada']}&date={hoy}"
+            url = f"https://v3.football.api-sports.io/fixtures?league={liga['id']}&date={hoy}"
             response = requests.get(url, headers=HEADERS)
             data = response.json()
 
@@ -47,10 +55,7 @@ def filtrar_partidos_hoy():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/run')
-def index():
-    return "✅ Conectado a API-Football: Vlaz"
-
+# Ejecutar app
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
