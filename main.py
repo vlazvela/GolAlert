@@ -4,6 +4,7 @@ import json
 from flask import Flask, jsonify
 #from datetime import datetime, timedelta
 from datetime import datetime, timedelta
+from dateutil import parser
 from dotenv import load_dotenv
 
 # Cargar variables del archivo .env
@@ -24,8 +25,9 @@ def index():
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
-        #hoy = datetime.utcnow().strftime('%Y-%m-%d')
+        
         hoy = (datetime.utcnow() - timedelta(hours=5)).strftime('%Y-%m-%d')
+
 
         url = f"https://v3.football.api-sports.io/fixtures?date={hoy}"
 
@@ -47,7 +49,7 @@ def filtrar_partidos_hoy():
                 partidos_filtrados.append({
                     "liga": partido["league"]["name"],
                     "partido": f'{partido["teams"]["home"]["name"]} vs {partido["teams"]["away"]["name"]}',
-                    "hora": partido["fixture"]["date"][11:16],  # solo hora HH:MM
+                    "hora": (parser.isoparse(partido["fixture"]["date"]) - timedelta(hours=5)).strftime("%H:%M"),
                     "pais": partido["league"]["country"]
                 })
 
