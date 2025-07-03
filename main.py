@@ -4,55 +4,74 @@ import json
 from flask import Flask, jsonify
 from dotenv import load_dotenv
 
-# Cargar las variables de entorno
+# Cargar variables de entorno desde .env
 load_dotenv()
 
-# Configuración inicial
 app = Flask(__name__)
+
 API_KEY = os.getenv("API_FOOTBALL_KEY")
 HEADERS = {
-    "x-rapidapi-host": "v3.football.api-sports.io",
-    "x-rapidapi-key": API_KEY
+    "x-apisports-key": API_KEY
 }
 
-# Endpoint para mostrar partidos EN VIVO de ligas permitidas
-@app.route('/live', methods=['GET'])
+print("API_KEY cargada:", bool(API_KEY))
+
+@app.route('/test-live', methods=['GET'])
 def partidos_en_vivo():
     try:
-        with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
-            ligas_permitidas = json.load(f)
-
-        ids_permitidos = {liga["id"] for liga in ligas_permitidas}
         url = "https://v3.football.api-sports.io/fixtures?live=all"
-
         response = requests.get(url, headers=HEADERS)
         data = response.json()
 
-        partidos_filtrados = []
+        partidos = []
 
         for partido in data.get("response", []):
-            liga_id = partido["league"]["id"]
-            if liga_id in ids_permitidos:
-                partidos_filtrados.append({
-                    "liga": partido["league"]["name"],
-                    "pais": partido["league"]["country"],
-                    "partido": f"{partido['teams']['home']['name']} vs {partido['teams']['away']['name']}",
-                    "minuto": partido["fixture"]["status"]["elapsed"],
-                    "resultado": f"{partido['goals']['home']} - {partido['goals']['away']}"
-                })
+            fixture_id = partido["fixture"]["id"]
+            minuto = partido["fixture"]["status"]["elapsed"] or 0
+            local = partido["teams"]["home"]["name"]
+            visitante = partido["teams"]["away"]["name"]
+            goles_local = partido["goals"]["home"]
+            goles_visitante = partido["goals"]["away"]
+            liga = partido["league"]["name"]
+            pais = partido["league"]["country"]
+
+            # Obtener estadísticas del fixture
+            stats_url = f"https://v3.football.api-sports.io/fixtures/statistics?fixture={fixture_id}"
+            stats_res = requests.get(stats_url, headers=HEADERS)
+            stats_data = stats_res.json().get("response", [])
+
+            estadisticas_filtradas = {}
+            tipos_deseados = [
+                "Total Shots", "Shots on Goal", "Shots off Goal", "Blocked Shots",
+                "Corner Kicks", "Red Cards", "Goalkeeper Saves",
+                "Big Chances", "Big Chances Missed"
+            ]
+
+            for equipo in stats_data:
+                nombre_equipo = equipo["team"]["name"]
+                for stat in equipo["statistics"]:
+                    tipo = stat["type"]
+                    valor = stat["value"] or 0
+                    if tipo in tipos_deseados:
+                        clave = f"{tipo} ({nombre_equipo})"
+                        estadisticas_filtradas[clave] = valor
+
+            partidos.append({
+                "liga": liga,
+                "pais": pais,
+                "partido": f"{local} vs {visitante}",
+                "minuto": minuto,
+                "marcador": f"{goles_local} - {goles_visitante}",
+                "estadisticas": estadisticas_filtradas
+            })
 
         return jsonify({
-            "total_partidos_en_vivo": len(partidos_filtrados),
-            "partidos": partidos_filtrados
+            "total_partidos": len(partidos),
+            "partidos": partidos
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# Verificación de conexión
-@app.route('/run')
-def index():
-    return "✅ API-Football conectada"
 
 # Ejecutar app
 if __name__ == '__main__':
