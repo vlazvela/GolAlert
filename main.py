@@ -24,7 +24,8 @@ def index():
 @app.route('/init', methods=['GET'])
 def filtrar_partidos_hoy():
     try:
-        hoy = datetime.utcnow().strftime('%Y-%m-%d')
+        #hoy = datetime.utcnow().strftime('%Y-%m-%d')
+        hoy = (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d')
 
         with open("ligas_permitidas.json", "r", encoding="utf-8") as f:
             ligas_permitidas = json.load(f)
